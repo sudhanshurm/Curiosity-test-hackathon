@@ -23,7 +23,6 @@ st.set_page_config(page_title="📊 Curiosity: AI Assistant for Cost", layout="w
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-
 def config_env_variables():
     os.environ['AWS_CONFIG_FILE'] = r'C:\Users\223149195\.aws\credentials'
     os.environ['REQUESTS_CA_BUNDLE'] = r'C:\Users\223149195\cacert.pem'
@@ -136,7 +135,6 @@ def generate_sql_response(question, session_id="default_session"):
         config={"configurable": {"session_id": session_id}}
     )
     return response
-
 
 def truncate_message_history(history, max_pairs=5):
     """Keep only the most recent conversation pairs."""

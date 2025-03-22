@@ -18,6 +18,8 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from prompts import response_template, template
 
+viz_suggestion_prompt = ChatPromptTemplate.from_template(viz_suggestion_template)
+
 def config_env_variables():
     os.environ['AWS_CONFIG_FILE'] = r'C:\Users\223149195\.aws\credentials'
     os.environ['REQUESTS_CA_BUNDLE'] = r'C:\Users\223149195\cacert.pem'
@@ -100,7 +102,25 @@ def generate_sql_response(question, session_id="default_session"):
     )
     return response
 
-viz_suggestion_prompt = ChatPromptTemplate.from_template(viz_suggestion_template)
+def display_message_history():
+    st.sidebar.subheader("Message History Contents")
+    
+    message_history = get_session_history("default_session")
+
+    if message_history and message_history.messages:
+        for i, msg in enumerate(message_history.messages):
+            role = "User" if msg.type == "human" else "Assistant"
+            content = msg.content[:300] + "..." if len(msg.content) > 300 else msg.content
+            st.sidebar.text(f"{i+1}. {role}:")
+            st.sidebar.text_area(f"Content {i+1}", content, height=100, key=f"hist_{i}")
+    else:
+        st.sidebar.info("No messages in history")
+    
+    # Display token count estimate (rough estimate)
+    if message_history and message_history.messages:
+        total_chars = sum(len(msg.content) for msg in message_history.messages)
+        est_tokens = total_chars // 4
+        st.sidebar.info(f"Estimated token count: ~{est_tokens}")
 
 def get_visualization_suggestion(query, results_df, question):
 
