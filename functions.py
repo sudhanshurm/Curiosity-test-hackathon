@@ -1,11 +1,28 @@
 import os
+import re
+import streamlit as st
+import plotly as px
+import pandas as pd
+from sqlalchemy import text
+from prompts import viz_suggestion_template
+from langchain_core.prompts import ChatPromptTemplate
+import json
+from langchain_aws import ChatBedrock
+from langchain_experimental.sql.base import SQLDatabase
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.chat_history import BaseChatMessageHistory
+from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_core.chat_history import BaseChatMessageHistory
+from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnablePassthrough
+from prompts import response_template, template
+
 def config_env_variables():
     os.environ['AWS_CONFIG_FILE'] = r'C:\Users\223149195\.aws\credentials'
     os.environ['REQUESTS_CA_BUNDLE'] = r'C:\Users\223149195\cacert.pem'
     os.environ['HTTPS_PROXY'] = "http://PITC-Zscaler-ASPAC-Bangalore3PR.proxy.corporate.ge.com:80"
     os.environ['AWS_DEFAULT_PROFILE'] = 'mfa'
-
-import re
 
 def extract_sql_query(explanation_text):
 
@@ -24,9 +41,6 @@ def extract_sql_query(explanation_text):
             return code
         
     return None
-
-import streamlit as st
-import plotly as px
 
 def create_visualization(df, viz_type, x_axis, y_axis, color_by, title):
     if df.empty:
@@ -70,10 +84,6 @@ def truncate_message_history(history, max_pairs=5):
         history.messages = messages[-max_pairs:]
     return history
 
-
-import pandas as pd
-from sqlalchemy import text
-
 def execute_query(self, query):
     try:
         with self._engine.connect() as connection:
@@ -89,10 +99,6 @@ def generate_sql_response(question, session_id="default_session"):
         config={"configurable": {"session_id": session_id}}
     )
     return response
-
-from prompts import viz_suggestion_template
-from langchain_core.prompts import ChatPromptTemplate
-import json
 
 viz_suggestion_prompt = ChatPromptTemplate.from_template(viz_suggestion_template)
 
@@ -133,18 +139,6 @@ def get_visualization_suggestion(query, results_df, question):
             "visualization_type": "none",
             "description": f"Error: {str(e)}"
         }
-
-import os
-from langchain_aws import ChatBedrock
-from langchain_experimental.sql.base import SQLDatabase
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.chat_history import BaseChatMessageHistory
-from langchain_community.chat_message_histories import ChatMessageHistory
-from langchain_core.chat_history import BaseChatMessageHistory
-from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough
-from prompts import response_template, template
 
 @st.cache_resource
 def initialize_resources():
