@@ -1,11 +1,10 @@
-#Configurations
+import os
 def config_env_variables():
     os.environ['AWS_CONFIG_FILE'] = r'C:\Users\223149195\.aws\credentials'
     os.environ['REQUESTS_CA_BUNDLE'] = r'C:\Users\223149195\cacert.pem'
     os.environ['HTTPS_PROXY'] = "http://PITC-Zscaler-ASPAC-Bangalore3PR.proxy.corporate.ge.com:80"
     os.environ['AWS_DEFAULT_PROFILE'] = 'mfa'
 
-#SQL_Extraction
 import re
 
 def extract_sql_query(explanation_text):
@@ -26,7 +25,6 @@ def extract_sql_query(explanation_text):
         
     return None
 
-#Visualization
 import streamlit as st
 import plotly as px
 
@@ -66,7 +64,6 @@ def create_visualization(df, viz_type, x_axis, y_axis, color_by, title):
         st.error(f"Error creating visualization: {e}")
         return None
 
-#Truncate Message History
 def truncate_message_history(history, max_pairs=5):
     messages = history.messages
     if len(messages) > max_pairs:
@@ -74,7 +71,6 @@ def truncate_message_history(history, max_pairs=5):
     return history
 
 
-#Execution of the query Generated
 import pandas as pd
 from sqlalchemy import text
 
@@ -87,7 +83,6 @@ def execute_query(self, query):
         # You could add logging here
         raise Exception(f"Database query failed: {str(e)}")
 
-
 def generate_sql_response(question, session_id="default_session"):
     response = sql_chain_with_history.invoke(
         {"question": question},
@@ -95,8 +90,6 @@ def generate_sql_response(question, session_id="default_session"):
     )
     return response
 
-
-#Visulaization Suggestion
 from prompts import viz_suggestion_template
 from langchain_core.prompts import ChatPromptTemplate
 import json
@@ -141,8 +134,6 @@ def get_visualization_suggestion(query, results_df, question):
             "description": f"Error: {str(e)}"
         }
 
-
-#Initialize LLM and Cache Resources
 import os
 from langchain_aws import ChatBedrock
 from langchain_experimental.sql.base import SQLDatabase
@@ -154,12 +145,6 @@ from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 from prompts import response_template, template
-
-def config_env_variables():
-    os.environ['AWS_CONFIG_FILE'] = r'C:\Users\223149195\.aws\credentials'
-    os.environ['REQUESTS_CA_BUNDLE'] = r'C:\Users\223149195\cacert.pem'
-    os.environ['HTTPS_PROXY'] = "http://PITC-Zscaler-ASPAC-Bangalore3PR.proxy.corporate.ge.com:80"
-    os.environ['AWS_DEFAULT_PROFILE'] = 'mfa'
 
 @st.cache_resource
 def initialize_resources():
